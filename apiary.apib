@@ -1,0 +1,541 @@
+FORMAT: 1A
+HOST: https://localhost:3000/
+
+# Web Application per un Cinema
+
+Documentazione del progetto per la REST API del gruppo #9.
+
+## FILM [/films]
+
+### Visualizza tutti i film [GET]
+
+Restituisce la lista dei film presenti all'interno del Database.
+
++ Response 200 (application/json)
+    
+        {
+            count: result.length,
+            films: result.map(doc => {
+                return {
+                    _id: doc._id,
+                    titolo: doc.titolo,
+                    descrizione: doc.descrizione,
+                    anno: doc.anno,
+                    durata: doc.durata,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/films/' + doc._id
+                    }
+                }
+            })
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella richiesta dei film'
+        }
+
+### Aggiungi un film [POST]
+
+È possibile aggiungere un film.
+
++ Request (application/json)
+
+        {
+            "titolo": "titolo",
+            "descrizione": "descrizione",
+            "anno": "anno",
+            "durata": "durata"
+        }
+
++ Response 201 (application/json)
+
+        {
+            filmRegistrato: {
+                _id: result._id,
+                titolo: result.titolo,
+                descrizione: result.descrizione,
+                anno: result.anno,
+                durata:result.durata
+            },
+            message: 'Film registrato',
+            request: {
+                type: 'GET',
+                url: 'http://localhost:3000/films/' + result._id
+            }
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Operazione fallita'
+        }
+        
+## FILM SPECIFICO [/films/{filmProp}]
+
+### Visualizza un film [GET]
+
+Restituisce gli attributi di un film. La ricerca può avvenire tramite /{id} oppure /{titolo}.
+
++ Response 200 (application/json)
+    
+        {
+            message : 'Film trovato',
+            film: result,
+            url: 'http://localhost:3000/recensioni/' + result._id
+        }
+        
++ Response 404 (application/json)
+    
+        {
+            error: 'Film non trovato'
+        }
+
+### Elimina un film [DELETE]
+
+Elimina un film tramite /{id}.
+
++ Response 200 (application/json)
+
+        {
+            message: 'Film cancellato'
+        }
+
++ Response 404 (application/json)
+
+        {
+            error: 'Film non trovato'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error : 'Errore nella cancellazione del film'
+        }
+
+### Aggiorna un film [PATCH]
+
+Modifica i parametri di un film tramite /{id}. È possibile modificare un parametro, solo alcuni oppure tutti.
+
++ Request (application/json)
+
+        [
+            {"propName" : "parametro", "value" : "nuovo_valore"},
+            {"propName" : "parametro", "value" : "nuovo_valore"}
+        ]
+
++ Response 200 (application/json)
+
+        {
+            message: 'Film modificato correttamente'
+        }
+        
++ Response 404 (application/json)
+
+        {
+            error: 'Film non trovato'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error : 'Errore nella modifica del film'
+        }
+        
+## PRENOTAZIONI [/prenotazioni]
+
+### Visualizza prenotazioni [GET]
+
+Restituisce tutte le prenotazioni presenti nel Database.
+
++ Response 200 (application/json)
+    
+        {
+            count: result.length,
+            prenotazioni: result.map(doc => {
+                return {
+                    _id: doc._id,
+                    utente: doc.utente,
+                    infofilm: doc.infofilm,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/prenotazioni/' + doc._id
+                    }
+                }
+            })
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella richiesta delle prenotazioni'
+        }
+    
+### Crea prenotazione [POST]
+
+È possibile creare una prenotazione.
+
++ Request (application/json)
+
+        {
+            "utente" : "utenteID",
+            "infofilm" : "infofilmID"
+        }
+        
++ Response 201 (application/json)
+
+        {
+            prenotazioneEffettuata: {
+                _id: result._id,
+                utente: result.utente,
+                infofilm: result.infofilm
+            },
+            message: 'Prenotazione effettuata',
+            request: {
+                type: 'GET',
+                url: 'http://localhost:3000/prenotazioni/' + result._id
+            }
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Operazione fallita'
+        }
+
+## PRENOTAZIONI SPECIFICHE [/prenotazioni/{prenotazioneProp}]
+
+### Visualizza prenotazioni [GET]
+
+Restituisce la lista delle prenotazioni effettuate da un utente (/{utenteId}) oppure cercarne solo una tramite /{id}.
+
++ Response 200 (application/json)
+    
+        {
+            prenotazione: result
+        }
+
++ Response 404 (application/json)
+
+        {
+            error: 'Prenotazione non trovata'
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nel trovare informazioni sul film'
+        }
+
+### Elimina una prenotazione [DELETE]
+
+Elimina una prenotazione tramite /{id}.
+
++ Response 200 (application/json)
+
+        {
+            message: 'Prenotazione cancellata'
+        }
+
++ Response 404 (application/json)
+
+        {
+            error: 'Prenotazione non trovata'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella cancellazione della prenotazione'
+        }
+
+## INFOFILM [/infofilms]
+
+Modello che contiene le informazioni dei film, in particolare data, ora, posti liberi e le referenze a film e sala.
+
+### Visualizza informazioni di tutti i film [GET]
+
+Restituisce la lista delle infofilm presenti all'interno del Database.
+
++ Response 200 (application/json)
+    
+        {
+            count: result.length,
+            infofilms: result.map(doc => {
+                return {
+                    _id: doc._id,
+                    sala: doc.sala,
+                    film: doc.film,
+                    giorno: doc.giorno,
+                    mese: doc.mese,
+                    anno: doc.anno,
+                    ora: doc.ora,
+                    posti_liberi: doc.posti_liberi,
+                    request: {
+                        type : 'GET',
+                        url : 'http://localhost:3000/infofilms/' + doc._id
+                    }
+                }
+            })
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella richiesta delle informazioni sui film'
+        }
+
+### Aggiungi delle informazioni di un film [POST]
+
+È possibile creare un elemento infofilm.
+
++ Request (application/json)
+
+        {
+            "salaId": "salaId",
+            "filmId": "filmId",
+            "giorno": "giorno",
+            "mese": "mese",
+            "anno": "anno",
+            "ora": "ora",
+            "posti_liberi": "posti_liberi"
+        }
+
++ Response 201 (application/json)
+
+        {
+            infofilmRegistrato: {
+                _id: result._id,
+                sala: result.sala,
+                film: result.film,
+                giorno: result.giorno,
+                mese: result.mese,
+                anno: result.anno,
+                ora: result.ora,
+                posti_liberi: result.posti_liberi
+            },
+            message: 'Film registrato',
+            request: {
+                type: 'GET',
+                url: 'http://localhost:3000/infofilms/' + result._id
+            }
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Operazione fallita'
+        }
+        
+## INFOFILM SPECIFICHE [/infofilms/{infofilmProp}]
+
+### Visualizza informazioni di un film [GET]
+
+Restituisce gli attributi di un film. La ricerca può avvenire tramite /{id} oppure /{filmId}.
+
++ Response 200 (application/json)
+    
+        {
+            infofilm: result
+        }
+        
++ Response 404 (application/json)
+
+        {
+            error: 'Informazioni sul film non trovate'
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nel trovare informazioni sul film'
+        }
+
+### Elimina un elemento infofilm [DELETE]
+
+Elimina un elemento infofilm tramite /{id}.
+
++ Response 200 (application/json)
+
+        {
+            message: 'Informazioni sul film cancellate'
+        }
+
++ Response 404 (application/json)
+
+        {
+            error: 'Informazioni sul film non trovate'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella cancellazione delle informazioni del film'
+        }
+
+### Aggiorna un elemento infofilm [PATCH]
+
+Modifica i parametri di un infofilm tramite /{id}. È possibile modificare un parametro, solo alcuni oppure tutti.
+
++ Request (application/json)
+
+        [
+            {"propName" : "parametro", "value" : "nuovo_valore"},
+            {"propName" : "parametro", "value" : "nuovo_valore"}
+        ]
+
++ Response 200 (application/json)
+
+        {
+            message: 'Informazioni sul film modificate correttamente'
+        }
+        
++ Response 404 (application/json)
+
+        {
+            error: 'Informazioni sul film non trovate'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella modifica delle informazioni del film'
+        }
+
+## SALE [/sale]
+
+### Visualizza sale del cinema [GET]
+
+Restituisce la lista delle sale presenti all'interno del Database.
+
++ Response 200 (application/json)
+    
+        {
+            count: result.length,
+            sale: result.map(doc => {
+                return {
+                    _id: doc._id,
+                    nome: doc.nome,
+                    posti_tot: doc.posti_tot,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/sale/' + doc._id
+                    }
+                }
+            })
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella richiesta delle sale'
+        }
+
+### Aggiungi delle informazioni di un film [POST]
+
+È possibile creare una sala.
+
++ Request (application/json)
+
+        {
+            "nome": "nome",
+            "posti_tot": "posti_tot"
+        }
+
++ Response 201 (application/json)
+
+        {
+            salaRegistrata: {
+                _id: result._id,
+                nome: result.nome,
+                posti_tot: result.posti_tot
+            },
+            message: 'Sala registrata',
+            request: {
+                type: 'GET',
+                url: 'http://localhost:3000/sale/' + result._id
+            }
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Operazione fallita'
+        }
+        
+## SALA SPECIFICA [/sale/{salaProp}]
+
+### Visualizza sala [GET]
+
+Restituisce gli attributi di una sala. La ricerca può avvenire tramite /{id} oppure /{nome}.
+
++ Response 200 (application/json)
+    
+        {
+            sala: result
+        }
+        
++ Response 404 (application/json)
+
+        {
+            error: 'Sala non trovata'
+        }
+
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nel trovare la sala'
+        }
+
+### Elimina una sala [DELETE]
+
+Elimina una sala tramite /{id}.
+
++ Response 200 (application/json)
+
+        {
+            message: 'Sala cancellata'
+        }
+
++ Response 404 (application/json)
+
+        {
+            error: 'Sala non trovata'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella cancellazione della sala'
+        }
+
+### Aggiorna un elemento infofilm [PATCH]
+
+Modifica i parametri di una sala tramite /{id}. È possibile modificare un parametro, solo alcuni oppure tutti.
+
++ Request (application/json)
+
+        [
+            {"propName" : "parametro", "value" : "nuovo_valore"},
+            {"propName" : "parametro", "value" : "nuovo_valore"}
+        ]
+
++ Response 200 (application/json)
+
+        {
+            message: 'Sala modificata correttamente'
+        }
+        
++ Response 404 (application/json)
+
+        {
+            error: 'Sala non trovata'
+        }
+        
++ Response 500 (application/json)
+
+        {
+            error: 'Errore nella modifica della sala'
+        }
+
