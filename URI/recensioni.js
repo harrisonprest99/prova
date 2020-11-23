@@ -111,7 +111,7 @@ router.get('/:recensioneProp', (req, res, next) => {
 });
 
 // gestore richieste POST
-router.post('/', checkAuth, (req, res, next) => {
+router.post('/', /*checkAuth,*/ (req, res, next) => {
     Film.findById(req.body.filmId)
     .then(film => {
         if (!film){
@@ -168,7 +168,7 @@ router.post('/', checkAuth, (req, res, next) => {
 });
 
 // gestore richieste DELETE
-router.delete('/:recensioneId', checkAuth, (req, res, next) => {
+router.delete('/:recensioneId', /*checkAuth,*/ (req, res, next) => {
     const id = req.params.recensioneId;
     Recensione
     .findById(id)

@@ -133,4 +133,75 @@ router.delete('/:utenteId', (req, res, next) => {
     });
 });
 
+router.get('/', (req, res, next) => {
+    Utente
+    .find()
+    .select('_id username email password')
+    .exec()
+    .then(result => {
+        console.log(result);
+        res.status(200).json({
+            count: result.length,
+            utenti: result.map(doc => {
+                return {
+                    _id: doc._id,
+                    username: doc.username,
+                    email: doc.email,
+                    password: doc.password,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/utenti/' + doc._id
+                    }
+                }
+            })    
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            error: 'Errore nella richiesta degli utenti'
+        });
+    });
+});
+
+// gestore richieste GET specifiche
+router.get('/:utenteProp', (req, res, next) => {
+    const prop = req.params.utenteProp;
+    Utente
+    .findById(prop)
+    .select('_id username email password')
+    .exec()
+    .then(result => {
+        if (result.length != 0) {
+            console.log(result)
+            res.status(200).json({
+                message: 'Utente trovato',
+                utente: result,
+                url: 'http://localhost:3000/recensioni/' + result._id
+            });
+        }
+    })
+    .catch(err => {
+        Utente
+        .find({email : prop})
+        .select('_id username email password')
+        .exec()
+        .then(result => {
+            if (result.length == 0){
+                console.log(err);
+                res.status(404).json({
+                    error: 'Utente non trovato'
+                });
+            }
+            else {
+                console.log(result);
+                res.status(200).json({
+                    message: 'Utente trovato',
+                    utente: result,
+                    url: 'http://localhost:3000/utenti/' + result._id
+                });
+            }
+        })
+    });
+});
 module.exports = router;
