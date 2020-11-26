@@ -8,7 +8,7 @@ const Utente = require('../MODELS/utente');
 const checkAuth = require('../MIDDLEWARE/check-auth');
 
 // gestore richieste GET
-router.get('/', checkAuth, (req, res, next) => {
+router.get('/', /*checkAuth,*/ (req, res, next) => {
     Prenotazione
     .find()
     .select('_id utente infofilm')
@@ -26,7 +26,7 @@ router.get('/', checkAuth, (req, res, next) => {
                     infofilm: doc.infofilm,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/prenotazioni/' + doc._id
+                        url: '../prenotazioni/' + doc._id
                     }
                 }
             })            
@@ -41,7 +41,7 @@ router.get('/', checkAuth, (req, res, next) => {
 });
 
 // gestore richieste GET
-router.get('/:prenotazioneProp', checkAuth, (req, res, next) => {
+router.get('/:prenotazioneProp', /*checkAuth*/ (req, res, next) => {
     const prop = req.params.prenotazioneProp;
     Prenotazione
     .findById(prop)
@@ -88,7 +88,7 @@ router.get('/:prenotazioneProp', checkAuth, (req, res, next) => {
 });
 
 // gestore richieste POST
-router.post('/', checkAuth, (req, res, next) => {
+router.post('/', /*checkAuth*/ (req, res, next) => {
     Infofilm.findById(req.body.infofilmId)
     .then(infofilm => {
         if (!infofilm){
@@ -125,7 +125,7 @@ router.post('/', checkAuth, (req, res, next) => {
             message: 'Prenotazione effettuata',
             request: {
                 type: 'GET',
-                url: 'http://localhost:3000/prenotazioni/' + result._id
+                url: '../prenotazioni/' + result._id
             }
         });
     })
@@ -138,7 +138,7 @@ router.post('/', checkAuth, (req, res, next) => {
 });
 
 // gestore richieste DELETE
-router.delete('/:prenotazioneId', checkAuth, (req, res, next) => {
+router.delete('/:prenotazioneId', /*checkAuth*/ (req, res, next) => {
     const id = req.params.prenotazioneId;
     Prenotazione
     .findById(id)

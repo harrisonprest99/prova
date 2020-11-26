@@ -12,7 +12,7 @@ const utentiRoute = require('./URI/utenti.js');
 const recensioniRoute = require('./URI/recensioni.js');
 
 // connessione al database
-mongoose.connect('mongodb+srv://ADMIN:MJM9qhqIcXUbdCHd@test.dgbif.mongodb.net/Cinema?retryWrites=true&w=majority', 
+mongoose.connect("mongodb+srv://ADMIN:MJM9qhqIcXUbdCHd@test.dgbif.mongodb.net/Cinema?retryWrites=true&w=majority", 
 { useUnifiedTopology: true , useNewUrlParser: true});
 
 // configurazione del body-parser
@@ -41,5 +41,6 @@ app.use('/utenti' , utentiRoute);
 app.use('/recensioni' , recensioniRoute);
 
 app.use('/', express.static('static'));
+app.use('/films', express.static('static'));
 
 module.exports = app;

@@ -29,7 +29,7 @@ router.get('/', (req, res, next) => {
                     commento: doc.commento,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/recensioni/' + doc._id
+                        url: '../recensioni/' + doc._id
                     }
                 }
             })
@@ -155,7 +155,7 @@ router.post('/', /*checkAuth,*/ (req, res, next) => {
             message: 'Recensione registrata',
             request: {
                 type: 'GET',
-                url: 'http://localhost:3000/recensioni/' + result._id
+                url: '../recensioni/' + result._id
             }
         });
     })

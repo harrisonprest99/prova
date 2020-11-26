@@ -84,6 +84,9 @@ router.post('/login', (req, res, next) => {
                 );
                 return res.status(200).json({
                     message: 'Auth successful',
+                    email: utente[0].email,
+                    username: utente[0].username,
+                    _id: utente[0]._id,
                     token: token
                 });
             }
@@ -148,9 +151,10 @@ router.get('/', (req, res, next) => {
                     username: doc.username,
                     email: doc.email,
                     password: doc.password,
+                    self: '/utenti/' + doc._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/utenti/' + doc._id
+                        url: '../utenti/' + doc._id
                     }
                 }
             })    
@@ -177,7 +181,8 @@ router.get('/:utenteProp', (req, res, next) => {
             res.status(200).json({
                 message: 'Utente trovato',
                 utente: result,
-                url: 'http://localhost:3000/recensioni/' + result._id
+                self: '/utenti/' + doc._id,
+                url: '../recensioni/' + result._id
             });
         }
     })
@@ -198,7 +203,7 @@ router.get('/:utenteProp', (req, res, next) => {
                 res.status(200).json({
                     message: 'Utente trovato',
                     utente: result,
-                    url: 'http://localhost:3000/utenti/' + result._id
+                    url: '../utenti/' + result._id
                 });
             }
         })

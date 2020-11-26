@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Registrazione</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+<body>
+    <div class="head">
+      <marquee direction='left'>  
+        <h1 type="marquee"> 
+          A causa delle restrizioni contro il CoVid-19, il cinema resterò chiuso fino a data da destinarsi. Ci scusiamo per il disagio
+        </h1>
+      </marquee>
+      <table>
+        <tr>
+          <th>
+            <a href="http://localhost:3000/">
+              <img src= "image/logo.png" alt="Pagina principale" style="width:150px;height:100px;">
+            </a>
+          </th>
+          <th style="width:60%"> 
+            <h1 type="titolo">
+              CINEMA PREST STIVY JACK
+            </h1>
+          </th>
+          <th>
+            <form class="head" method="GET" action="login.html"> 
+              <button>Login</button>
+            </form>
+          <th>
+            <form class="head" action="/" method="GET">
+              <table>
+                <tr>
+                  <th>
+                      <input type="cerca" name="titolo" id= "Cerca" placeholder= "Cerca"/>
+                  </th>
+                  <th>
+                    <input type="image" src= "image/search.png" border="0" width="75" height="75"/>
+                  </th>
+                </tr>
+              </table>
+            </form>
+          </th>
+        </tr>
+      </table>
+    </div>
+    
+    <form class="box" action="/" method="post">
+      <h1>Registrazione</h1>
+      <input type="text" name="email" id="email" placeholder="Email"/>
+      <input type="text" id="username" placeholder="Username"/>
+      <input type="password" id="password" placeholder="Password"/>
+      <input type="submit" onclick="registrazione()" value="Registrati"/>
+    </form>
+
+<form action="/" method="post">
+  <label for="fname">First name:</label><br>
+  <input type="text" id="fname" name="fname" value="John"><br>
+  <label for="lname">Last name:</label><br>
+  <input type="text" id="lname" name="lname" value="Doe"><br><br>
+  <input type="submit" onclick="registrazione()" value="Submit">
+</form>
+
+</body>
+
+<script src="script.js">  
+</script> 
+
+</html>

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const checkAuth = require('../MIDDLEWARE/check-auth');
+const film = require('../MODELS/film.js');
 
 const Film = require('../MODELS/film.js');
 
@@ -9,7 +10,7 @@ const Film = require('../MODELS/film.js');
 router.get('/', (req, res, next) => {
     Film
     .find()
-    .select('_id titolo descrizione anno durata')
+    .select('_id titolo descrizione anno durata linkImmagine linkTrailer')
     .exec()
     .then(result => {
         console.log(result);
@@ -22,10 +23,12 @@ router.get('/', (req, res, next) => {
                     descrizione: doc.descrizione,
                     anno: doc.anno,
                     durata: doc.durata,
-                    self: '/films/' + doc.titolo,
+                    linkImmagine: doc.linkImmagine,
+                    linkTrailer: doc.linkTrailer,
+                    self: '/films/' + doc._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/films/' + doc._id
+                        url: '../films/' + doc._id
                     }
                 }
             })    
@@ -44,7 +47,7 @@ router.get('/:filmProp', (req, res, next) => {
     const prop = req.params.filmProp;
     Film
     .findById(prop)
-    .select('_id titolo descrizione anno durata')
+    .select('_id titolo descrizione anno durata linkImmagine linkTrailer')
     .exec()
     .then(result => {
         if (result.length != 0) {
@@ -52,15 +55,15 @@ router.get('/:filmProp', (req, res, next) => {
             res.status(200).json({
                 message: 'Film trovato',
                 film: result,
-                self: '/films/' + result.titolo,
-                url: 'http://localhost:3000/recensioni/' + result._id
+                self: '/films/' + result._id,
+                url: '../recensioni/' + result._id
             });
         }
     })
     .catch(err => {
         Film
         .find({titolo : prop})
-        .select('_id titolo descrizione anno durata')
+        .select('_id titolo descrizione anno durata linkImmagine linkTrailer')
         .exec()
         .then(result => {
             if (result.length == 0){
@@ -74,7 +77,7 @@ router.get('/:filmProp', (req, res, next) => {
                 res.status(200).json({
                     message: 'Film trovato',
                     film: result,
-                    url: 'http://localhost:3000/recensioni/' + result._id
+                    url: '../recensioni/' + result._id
                 });
             }
         })
@@ -88,7 +91,9 @@ router.post('/',/* checkAuth, */(req, res, next) => {
         titolo: req.body.titolo,
         descrizione: req.body.descrizione,
         anno: req.body.anno,
-        durata: req.body.durata
+        durata: req.body.durata,
+        linkImmagine: req.body.linkImmagine,
+        linkTrailer: req.body.linkTrailer
     });
     film
     .save()
@@ -105,7 +110,7 @@ router.post('/',/* checkAuth, */(req, res, next) => {
             message: 'Film registrato',
             request: {
                 type: 'GET',
-                url: 'http://localhost:3000/films/' + result.titolo
+                url: '../films/' + result.titolo
             }
         });
     })

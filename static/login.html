@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <div class="head">
+      <marquee direction='left'>  
+        <h1 type="marquee"> 
+          A causa delle restrizioni contro il CoVid-19, il cinema resterò chiuso fino a data da destinarsi. Ci scusiamo per il disagio
+        </h1>
+      </marquee>
+      <table>
+        <tr>
+          <th>
+            <a href="../">
+              <img src= "image/logo.png" alt="Pagina principale" style="width:150px;height:100px;">
+            </a>
+          </th>
+          <th style="width:60%"> 
+            <h1 type="titolo">
+              CINEMA PREST STIVY JACK
+            </h1>
+          </th>
+          <th>
+            <form class="head" method="GET" action="login.html"> 
+              <button>Login</button>
+            </form>
+          <th>
+            <form class="head" action="/" method="GET">
+              <table>
+                <tr>
+                  <th>
+                      <input type="cerca" name="titolo" id= "Cerca" placeholder= "Cerca"/>
+                  </th>
+                  <th>
+                    <input type="image" src= "image/search.png" border="0" width="75" height="75"/>
+                  </th>
+                </tr>
+              </table>
+            </form>
+          </th>
+        </tr>
+      </table>
+    </div>
+
+    <form class="box" action="utenti/login" method="post" name="loginform" id="loginform">
+      <span id="loggedUser"></span>
+      <h1>ACCEDI</h1>
+      <input  type="text"placeholder="Username" name="email" value="harrisonprest70@gmail.com" id="loginEmail"/>
+      <input  type="password"placeholder="Password" name="email" value="ciao" id="loginPassword"/>
+      <input  type="button" value="Accedi" onclick="login()"/>LogIn
+      <h3>Non sei registrato? <a href="registrazione.html">Registrati</a></h3>
+    </form> 
+    
+    <script src="script.js">
+  
+    </script> 
+
+  </body>
+
+</html>

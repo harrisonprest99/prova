@@ -2,90 +2,123 @@
 <html>
 
 <head>
-
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body style= "background-color : rgb(37, 41, 44)">
+<body class="body">
 
 <title>Cinema Stivy Prest</title>
-<marquee direction='right'> Questo testo scorre verso destra </marquee>
-<table  style="width:100%; vertical-align:middle;">
-  <tr style=
-  "background-color : rgb(0, 0, 0); width: 100">
-    <th>
-      <a href="http://localhost:3000/">
-        <img src= "image/logo.png" alt="Pagina principale" style="width:150px;height:100px;">
-      </a>
-    </th>
-    <th style="width:60%"> 
-      <h1 style=
-      "color: rgb(255, 196, 1);
-      font-size:300%;
-      text-align: center;
-      font-family:osvald;"
-      >CINEMA PREST STIVY JACK
-      </h1>
-    </th>
-    <th>
-      <input 
-        type="image"
-        src= "image/login.png" 
-        onclick="logIn()" 
-        border="0"
-        width="200" 
-        height="70"
-        />
-      </input>
-    </th>
-    
-    <th>
-      <form action="" method="GET" >
-        <table>
-          <tr>
-            <th>
-              <input 
-                name="titolo" 
-                id= "Cerca"
-                style=  
-                  "background-color : rgb(0, 0, 0);
-                  color:white;
-                  font-size: medium;
-                  width:250px;
-                  height:50px;"/>
-            </th>
-            <th>
-                <input 
-                type="image"
-                src= "image/search.png"
-                onClick= "window.navigator"
-                border="0"
-                width="75" 
-                height="75"
+
+<div class="head">
+  <marquee direction='left'>  
+    <h1 type="marquee"> 
+      A causa delle restrizioni contro il CoVid-19, il cinema resterò chiuso fino a data da destinarsi. Ci scusiamo per il disagio
+    </h1>
+  </marquee>
+  <table>
+    <tr>
+      <th style="width:10%">
+        <a href="../">
+          <img src= "image/logo.png" alt="Pagina principale" style="width: 100%;">
+        </a>
+      </th>
+      <th style="width:50%"> 
+        <h1 type="titolo" style="margin: 10px 0px;">
+          CINEMA PREST STIVY JACK
+        </h1>
+      </th>
+      <th style="width: 5%;">
+        <span id="userName"></span>
+      </th> 
+      <th style="width:8%">
+        
+        <form action="" method="GET">
+          <input 
+              type="text"
+              name="login" 
+              id= "login"
+              value="login"
+              style="display: none;"
               />
-              </input>
-            </th>
-          </tr>
-        </table>
-      </form>
-    </th>
-  </tr>
-</table>
+          <input  type="button" value="Login" onclick="goToLogin()"/>
+        </form> 
+      </th>
+      
+    <form action="" method="GET">   
+      <th style="width:22%; padding-left: 1%;">
+        <input type="cerca" name="titolo" id= "Cerca" placeholder= "Cerca"/>
+      </th>
+      <th style="width: 5%; padding-left: 1%;">
+        <input  type="button"  style="background-image: url('image/search.png');" onclick="loadOne()"/>        
+      </th>
+    </form>
+      
+    </tr>
+  </table>
+</div>
 
-<table style="width:100%">
-  <tr style=
-  "background-color : rgb(0, 0, 0);">    
-    <th>
-    <ul 
-      id="films"
-      style=
-        text-align:left;
-        font-family:verdana;">
-    </ul>
-  </th>
-  </tr>
-</table>
+<div class="films" >
+  <table>
+    <tr>         
+      <th>     
+        <ul id="films" style="padding: 2.5%; padding-top: 11%;">
+        </ul>
+      </th>
+    </tr>
+  </table>
+</div>
 
-<script src="script.js"></script> 
+<div class="bottom" style="position: static;">
+  <table >
+    <tr>
+      <th style="width:80%">  
+        <h1 style="text-align: right;">
+            I nostri contatti:
+        </h1>
+      </th>
+      <th>
+        <a href="https://www.instagram.com/harrisonprest">
+          <img border="0" src="https://instagram-brand.com/wp-content/uploads/2016/11/Instagram_AppIcon_Aug2017.png?w=300" width="50px" height="50px">
+        </a>
+      </th>
+      <th style="width:10%">  
+        <a href="https://www.instagram.com/harrisonprest">
+          <h1>
+             @harrisonprest
+          </h1>
+        </a>
+      </th>
+      <th>
+        <a href="https://www.instagram.com/harrisonprest">
+          <img border="0" src="https://instagram-brand.com/wp-content/uploads/2016/11/Instagram_AppIcon_Aug2017.png?w=300" width="50" height="50">
+        </a>
+      </th>
+      <th style="width:10%">  
+        <a href="https://www.instagram.com/stivy_sommacal">
+          <h1 type="h1">
+            @stivy_sommacal
+          </h1>
+        </a>
+      </th>
+      <th>
+        <a href="https://www.instagram.com/harrisonprest">
+          <img border="0" src="https://instagram-brand.com/wp-content/uploads/2016/11/Instagram_AppIcon_Aug2017.png?w=300" width="50" height="50">
+        </a>
+      </th>
+      <th style="width:100%">  
+        <a href="https://www.instagram.com/jack.granade">
+          <h1 type="h1">
+             @jack.granade
+          </h1>
+        </a>
+      </th>
+    </tr>
+  </table>
+
+
+<script src="script.js">
+  
+</script> 
     
 </body>
 

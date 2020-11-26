@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
                     posti_tot: doc.posti_tot,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/sale/' + doc._id
+                        url: '../sale/' + doc._id
                     }
                 }
             })       
@@ -80,7 +80,7 @@ router.get('/:salaProp', (req, res, next) => {
 });
 
 // gestore richieste POST
-router.post('/', checkAuth, (req, res, next) => {
+router.post('/', /*checkAuth,*/ (req, res, next) => {
     const sala = new Sala({
         _id: new mongoose.Types.ObjectId(),
         nome: req.body.nome,
@@ -99,7 +99,7 @@ router.post('/', checkAuth, (req, res, next) => {
             message: 'Sala registrata',
             request: {
                 type: 'GET',
-                url: 'http://localhost:3000/sale/' + result._id
+                url: '../sale/' + result._id
             }
         });
     })
@@ -112,7 +112,7 @@ router.post('/', checkAuth, (req, res, next) => {
 });
 
 // gestore richieste DELETE
-router.delete('/:salaId', checkAuth, (req, res, next) => {
+router.delete('/:salaId', /*checkAuth,*/ (req, res, next) => {
     const id = req.params.salaId;
     Sala
     .findById(id)
@@ -145,7 +145,7 @@ router.delete('/:salaId', checkAuth, (req, res, next) => {
 });
 
 // gestore richieste PATCH
-router.patch('/:salaId', checkAuth, (req, res, next) => {
+router.patch('/:salaId', /*checkAuth,*/ (req, res, next) => {
     const id = req.params.salaId;
     Sala
     .findById(id)
