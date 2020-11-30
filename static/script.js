@@ -2,9 +2,19 @@ var loggedUser = {};
 var signedUser = {};
 
 function loadFilms() {
-
     const ul = document.getElementById('films'); 
     ul.innerHTML = '';
+    let slidespan = document.createElement('span');
+    slidespan.innerHTML=`
+            <div class="slideshow-container" >
+                <ul id="button"></ul>
+                <div id="slides">
+                </div>
+            </div>
+            <div id="dots" style="text-align:center"></div>`;
+    
+    ul.appendChild(slidespan);
+    slideshow();
 
     fetch('../films/')
     .then((resp) => resp.json()) 
@@ -13,27 +23,29 @@ function loadFilms() {
         return data.films.map(function(film) {
             let span = document.createElement('span');
             span.innerHTML = 
-                `<table>
+                `<table style="width:94vw; margin:1vw 2vw">
                   <tr>
                     <th width=30%>
-                        <img type="filmImage" src="${film.linkImmagine}">
-                                 
+                        <input type="text" name="titolo" id= "${film.titolo}" value="${film.titolo}" style="display:none"/>
+                        <input type="button" id="${film.titolo}" style="background-image: url('${film.linkImmagine}');" onclick="loadOne2(id)">    
                     </th>                    
                     <th>
                         <h1 type="titolo">
                             ${film.titolo} (${film.anno})
                         </h1>
-                      <h5 style="padding: 10px 40px;">
-                        ${film.durata}min 
-                      </h5>
-                      <p style="padding-left: 40px;">
-                        ${film.descrizione}
-                      </p>
+                        <h5>
+                            ${film.durata}min 
+                        </h5>
+                        <p>
+                            ${film.descrizione}
+                        </p>
                     </th>
                   </tr>
                 </table>`;
             
+            
             ul.appendChild(span);
+            
         })
     })
     .catch( error => console.error(error) );
@@ -50,85 +62,98 @@ function loadOne(){
     .then(
         function(data) { 
         console.log(data);
+        if (data.error!=null){
+            let err = document.createElement('span');
+                err.innerHTML =
+                    `<h1 type="filmerror">
+                        Errore: ${data.error}
+                    </h1>`; 
+                ul.appendChild(err)           
+        }else{
+            return data.film.map(function(film) { 
+            
+                let span = document.createElement('span');
+                span.innerHTML =
+                    `<table style="margin: 2vw; margin-top:8vw;">
+                        <tr>
+                            <th> 
+                                <iframe 
+                                    src="${film.linkTrailer}"
+                                    frameborder="0"
+                                    allowfullscreen="allowfullscreen">
+                                </iframe>
+                                <h1>
+                                    Scrivi la tua recensione
+                                </h1>
+    
+                                <ul id="formrecensioni" style="padding: 0vw 2vw; background-color: #0a0a0a">
+                                </ul>
+                                
+                                <ul id="recensioni" style="padding: 0vw 2vw; background-color: #0a0a0a">
+                                </ul>
+                                
+                            </th>
+                            <th style="vertical-align:top;">  
+                                <h1>
+                                    ${film.titolo}(${film.anno})      
+                                </h1>
+                                <h5>
+                                    ${film.durata}min     
+                                </h5>      
+                                </h1>
+                                <p>
+                                    ${film.descrizione}
+                                </p>                      
+                                
+                            </th>              
+                        </tr>
+
+                    </table>
+                    <p></p>`;
+                
+                // Append all our elements
+                ul.appendChild(span);
+                loadForm(film._id);
+                loadRecensioni(film._id);
+            })
+        }
+        
+    })
+    .catch( error => console.error(error) );
+}
+function loadOne2(titolo){
+    const ul = document.getElementById('films'); 
+    var titolo2 = document.getElementById(titolo).value;
+    ul.innerHTML = '';
+    fetch('../films/' + titolo2)
+    .then((resp) => resp.json())
+    .then(
+        function(data) { 
+        console.log(data);
         return data.film.map(function(film) { 
             
             let span = document.createElement('span');
             span.innerHTML =
-                `<table>
-                    <tr>
-                        <th>
-                            <h1 type="titolo">
-                                ${film.titolo}
-                            </h1>
-                        </th>
-                    </tr>
-                </table> 
-                <table>
+                `<table style="margin: 2vw; margin-top:8vw;">
                     <tr>
                         <th> 
-                            <iframe
-                                src="${film.linkTrailer}">
+                            <iframe 
+                                src="${film.linkTrailer}"
+                                frameborder="0"
+                                allowfullscreen="allowfullscreen">
                             </iframe>
                             <h1>
                                 Scrivi la tua recensione
                             </h1>
 
-                            <form class="recensioni" action="/" method="POST" >
-                                <table>
-                                <tr>
-                                    <th style="padding: 20px">
-                                    <input 
-                                        name="titolo" 
-                                        id= "titolo"
-                                        placeholder= "Titolo..."
-                                        type="titolo"
-                                    />
-                                    <h5 type="valutazione">
-                                        Valutazione
-                                    </h5>
-                                    <input type="radio" id="1" name="valutazione" value="1">
-                                        <label for="1">
-                                            <img src="image/stella.png" >
-                                        </label><br>
-                                    <input type="radio" id="2" name="valutazione" value="2">
-                                        <label for="2">
-                                            <img src="image/stella.png" >
-                                            <img src="image/stella.png" >
-                                        </label><br>
-                                    <input type="radio" id="3" name="valutazione" value="3">
-                                        <label for="3">
-                                            <img src="image/stella.png" >
-                                            <img src="image/stella.png" >
-                                            <img src="image/stella.png">
-                                        </label><br>
-                                    <input type="radio" id="4" name="valutazione" value="4">
-                                        <label for="4">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                        </label><br>
-                                    <input type="radio" id="5" name="valutazione" value="5">
-                                        <label for="5">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                            <img src="image/stella.png">
-                                        </label><br>
-                                    <input name="commento" id= "commento" type="commento"/>
-                                    </th>
-                                    <th>
-                                        <input type="image" src= "image/invio.png"  onclick="recensione(${film.self})" border="0" width="50" height="50"/>
-                                    </th>
-                                </tr>
-                                </table>
-                            </form>
-                            <ul id="recensioni" style="padding:20px">
+                            <ul id="formrecensioni" style="padding: 0vw 2vw; background-color: #0a0a0a">
+                            </ul>
+                            
+                            <ul id="recensioni" style="padding: 0vw 2vw; background-color: #0a0a0a">
                             </ul>
                             
                         </th>
-                        <th style="vertical-align:top; padding: 20px">  
+                        <th style="vertical-align:top;">  
                             <h1>
                                 ${film.titolo}(${film.anno})      
                             </h1>
@@ -138,25 +163,64 @@ function loadOne(){
                             </h1>
                             <p>
                                 ${film.descrizione}
-                            </p>                      
+                            </p>    
                             
-                        </th>              
-                    </tr>
-                    <tr>                   
-                        <form action="" method="GET" >
-                    
+                            <input  type="button" onclick="goToPrenotazioni('${film._id}')" value="Prenota un posto" style="width: 10vw; height: 3vw; background-color: rgb(50, 60, 204); font-size: 1vw; margin: 5vw; color: whitesmoke;"/>
+                            
+                        </th>          
                     </tr>
                 </table>
                 <p></p>`;
             
             // Append all our elements
             ul.appendChild(span);
+            loadForm(film._id);
             loadRecensioni(film._id);
         })
     })
     .catch( error => console.error(error) );
 }
 
+function loadForm(filmId){
+    console.log(filmId)
+    if (filmId!=0){
+        const form = document.getElementById('formrecensioni');
+        form.innerHTML =`
+        <form class="recensioni" action="/" method="POST" >
+            <table style="margin-right:1vw">
+            <tr>
+                <th style="padding: 2vw">
+                <input 
+                    name="titolo" 
+                    id= "titolo"
+                    placeholder= "Titolo..."
+                    type="titolo"
+                />
+                <h5 type="valutazione">
+                    Valutazione
+                </h5>
+                <input 
+                    name="valutazione" 
+                    id= "valutazione"
+                    placeholder= "Valutazione 1-5"
+                    type="titolo"
+                    style="width: 9vw"
+                />
+                <input name="commento" id= "commento" type="commento"/>
+                </th>
+                <th>
+                    <input type="button" style="background-image: url('image/invio.png');background-size: cover; width: 2.5vw; height: 2.5vw; padding-left: 0;" onclick="recensione('${filmId}')">
+                </th>
+            </tr>
+            </table>
+        </form>`;
+    }  else {
+        const formnull = document.getElementById('formrecensioni');
+        formnull.innerHTML =`<h5 type="valutazione">
+        Recensione effettuata!
+    </h5>`;
+    }
+}
 function loadRecensioni(filmId){
 
     const ul = document.getElementById('recensioni'); 
@@ -171,25 +235,25 @@ function loadRecensioni(filmId){
             let span = document.createElement('span');
             span.innerHTML = 
                 `<table type="utente">      
-                    <tr style=" background: none;">
-                        <th style="padding: 10px">
-                            <input type="image" src="image/defaultuser.png" name="" style="width:50px;height:50px;">
+                    <tr>
+                        <th style="padding: 0vw;">
+                            <input type="image" src="image/defaultuser.png" name="" style="width:2vw;height:2vw;">
                         </th>
                         <th>
-                            <h3>
+                            <h3 style="margin: 0; font-weight: 500; font-size:1vw;">
                                 ${recensione.utente.username}
                             </h3>
                         </th>
                     </tr>
                 </table>
-                <table>
+                <table style="width:50vw">
                     <tr style="background-color: #191919">                   
                         <th>                       
                             <h3 style="padding: 20px; margin: 0%">
                                 ${recensione.titolo}
                             </h3>
                             <h5 style="margin: 0%"> 
-                                ${recensione.valutazione} <img src="image/stella.png">
+                                ${recensione.valutazione} <img src="image/stella.png" style="width:1vw; height:1vw;">
                             </h5>
                             <p>
                                 ${recensione.commento}
@@ -210,8 +274,8 @@ function goToLogin(){
     ul.innerHTML = 
         `<form class="box" action="utenti/login" method="post" name="loginform" id="loginform">
             <h1>ACCEDI</h1>
-            <input  type="text"placeholder="Email" name="email" id="loginEmail"/>
-            <input  type="password"placeholder="Password" name="email" id="loginPassword"/>
+            <input  type="text" placeholder="Email" name="email" id="loginEmail"/>
+            <input  type="password" placeholder="Password" name="email" id="loginPassword"/>
             <input  type="button" value="Accedi" onclick="login()"/>
             <span id="loggedUser"></span>
             <h3>Non sei registrato? <input  type="button" value="Registrati" onclick="goToSignup()"/></h3>
@@ -238,32 +302,20 @@ function login()
         console.log(data);
         loggedUser.token = data.token;
         loggedUser.email = data.email;
-        loggedUser.id = data.id;
+        loggedUser._id = data._id;
         loggedUser.username=data.username;
         loggedUser.self = data.self;
-        console.log(loggedUser.email);
-        // loggedUser.id = loggedUser.self.substring(loggedUser.self.lastIndexOf('/') + 1);
+        
         if(loggedUser.email==null){
             errore.innerHTML=
             `<h3 style="color: #b53131">
-                Email o password errati
+                ${data.error}
             </h3>`
         }
         if(loggedUser.username!=null){
             loadFilms();
             userName.innerHTML = 
-            `<table type="utente">      
-                <tr style=" background: none;">
-                    <th style="padding: 10px">
-                        <input type="image" src="image/defaultuser.png" name="" style="width:40px;height:40px;">
-                    </th>
-                    <th>
-                        <h3>
-                            ${loggedUser.username}
-                        </h3>
-                    </th>
-                </tr>
-            </table>`
+            `<input type="image" src="image/defaultuser.png">`
         }
         
         return;
@@ -275,7 +327,7 @@ function login()
 function goToSignup(){
     const ul = document.getElementById('films');
     ul.innerHTML = 
-        `<form class="box" action="utenti/signup" method="post" name="signform" id="signform">
+        `<form class="box" action="utenti/signup" method="post" name="signform" id="signform" style="margin: 3vw 33vw; margin-top: 11vw">
             
             <h1>REGISTRATI</h1>
             <input  type="text" placeholder="Username" name="username" id="signUsername"/>
@@ -289,13 +341,14 @@ function goToSignup(){
 function signup()
 {
     //get the form object
-    var username = document.getElementById("signEmail").value;
+    var username = document.getElementById("signUsername").value;
     var email = document.getElementById("signEmail").value;
     var password = document.getElementById("signPassword").value;
     var errore= document.getElementById("signedUser")
      
     //var userName = document.getElementById("userName");
-    // console.log(email);
+    console.log(email);
+    console.log(username);
 
     fetch('../utenti/signup', {
         method: 'POST',
@@ -304,60 +357,168 @@ function signup()
     })
     .then((resp) => resp.json()) // Transform the data into json
     .then(function(data) { // Here you get the data to modify as you please
-        console.log(data);
-        loggedUser.email = data.email;
-        loggedUser.id = data.id;
-        loggedUser.username=data.username;
-
-        if(loggedUser.email==null){
-            errore.innerHTML=
-            `<h3 style="color: #b53131">
-                Email già esistente
-            </h3>`
-        }
-        // loggedUser.id = loggedUser.self.substring(loggedUser.self.lastIndexOf('/') + 1);
-        /*userName.innerHTML = 
-        `<table type="utente">      
-        <tr style=" background: none;">
-            <th style="padding: 10px">
-                <input type="image" src="image/defaultuser.png" name="" style="width:50px;height:50px;">
-            </th>
-            <th>
-                <h3>
-                    ${loggedUser.username}
-                </h3>
-            </th>
-        </tr>
-    </table>`*/
+        console.log(data.error); 
+        errore.innerHTML=
+        `<h3 style="color: #b53131">
+            ${data.error}
+        </h3>`       
         return;
     })
-    .catch( error => console.error(error) ); // If there is any error you will catch them here
+    .catch(function(error) {
+        console.log(error);
+        errore.innerHTML=
+        `<h3 style="color: #b53131">
+            ${error}
+        </h3>`
+    }); // If there is any error you will catch them here
 
 };
 
-function recensione(bookUrl)
-{
+function recensione(filmvalue){
     var titolo = document.getElementById("titolo").value;
     var valutazione = document.getElementById("valutazione").value;
     var commento = document.getElementById("commento").value;
-    console.log(bookUrl);
-    console.log(titolo);
-    console.log(valutazione);
-    console.log(commento);
-
-    fetch('../recensioni', {
+    
+    fetch('../recensioni/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-access-token': loggedUser.token
+            'Authorization': "Bearer " + loggedUser.token
         },        
-        body: JSON.stringify( { titolo: titolo, valutazione: valutazione, commento: commento, utente: loggedUser.self, film: filmUrl } ),
+        body: JSON.stringify( { utenteId: loggedUser._id, filmId: filmvalue, titolo: titolo, valutazione: valutazione, commento: commento} ),
     })
     .then((resp) =>{
         console.log(resp);
-        loadRecensioni();
+        loadRecensioni(filmvalue);
+        loadForm(0);
         return
     }) 
     .catch( error => console.log(error) ); // If there is any error you will catch them here
 
 };
+function goToPrenotazioni(filmvalue){
+    console.log(filmvalue);
+    const ul = document.getElementById('films');
+    ul.innerHTML = 
+        `<form class="box" action=""  name="prenotazioneform" id="prenotazioneform" style="margin: 3vw 33vw; margin-top: 11vw">
+            
+            <h1>Inserisci una data</h1>
+            <input  type="text" placeholder="mm/gg/aaaa" name="data" id="data"/>
+            
+            <input  type="button" value="Cerca per questo giorno" onclick="prenota('${filmvalue}')"/>
+            <span id="prenotaora"></span>
+        </form>`;
+
+};
+
+function prenota(filmvalue){
+    var datavalue = document.getElementById("data").value;
+    var prenotaora = document.getElementById('prenotaora');
+    prenotaora.innerHTML=``;
+    console.log(datavalue);
+    console.log(filmvalue);
+    fetch('../infofilms/' + filmvalue)
+    .then((resp) => resp.json())
+    .then(
+        function(data) { 
+        console.log(data);
+        return data.infofilm.map(function(infofilm) { 
+            console.log(infofilm);
+            if(infofilm.data==datavalue){
+                let span = document.createElement('span');
+                span.innerHTML =
+                `<form class="box" action="infofilm/" method="post" name="prenotaora" id="prenotaora" style="margin: 3vw 33vw; margin-top: 11vw">
+                    <h1>${infofilm.ora}</h1>
+                    <input  type="button" value="Registrati" onclick="prenotaorario('${infofilm._id}')"/>
+                    <span id="signedUser"></span>
+                </form>`;
+                prenotaora.appendChild(span);
+            }            
+        });
+    });
+}
+function prenotaorario(infofilmvalue){
+    //get the form object
+    console.log(infofilmvalue);
+
+    fetch('../prenotazioni', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + loggedUser.token
+        },
+        body: JSON.stringify( { utenteId: loggedUser._id, infofilmId: infofilmvalue} ),
+    })
+    .then((resp) =>{
+        console.log(resp);
+        return
+    })
+    .catch( error => console.error(error) ); // If there is any error you will catch them here
+
+};
+
+
+
+
+var slideIndex = 1;
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
+}
+
+function slideshow(){
+    var button = document.getElementById("button");
+    button.innerHTML=
+    `<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>`
+    const filmSlide = document.getElementById("slides");
+    const dots= document.getElementById("dots");
+    filmSlide.innerHTML='';
+    dots.innerHTML='';
+    var i=0;
+
+    fetch('../films/')
+    .then((resp) => resp.json()) 
+    .then(function(data) {
+        return data.films.map(function(film) {
+            let filmspan= document.createElement('span');
+            let dotspan = document.createElement('span');
+            i=i+1;
+            filmspan.innerHTML=`
+            <div class="mySlides fade" align="middle">
+                <img src="${film.linkBanner}" style="height: 29vw; width: 99vw">
+            </div>
+            `;
+            dotspan.innerHTML=`
+            <span class="dot" onclick="currentSlide(${i})"></span>
+            `;  
+            dots.appendChild(dotspan);  
+            filmSlide.appendChild(filmspan);
+            showSlides(1);
+        })
+        
+    })
+    .catch( error => console.error(error) );
+}

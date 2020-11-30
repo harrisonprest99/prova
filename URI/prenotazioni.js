@@ -16,7 +16,6 @@ router.get('/', /*checkAuth,*/ (req, res, next) => {
     .populate('infofilm','_id sala film giorno mese anno ora')
     .exec()
     .then(result => {
-        console.log(result);
         res.status(200).json({
             count: result.length,
             prenotazioni: result.map(doc => {
@@ -33,7 +32,6 @@ router.get('/', /*checkAuth,*/ (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({            
             error: 'Errore nella richiesta delle prenotazioni'
         });
@@ -51,7 +49,6 @@ router.get('/:prenotazioneProp', /*checkAuth*/ (req, res, next) => {
     .exec()
     .then(result => {
         if (result.length != 0) {
-            console.log(result)
             res.status(200).json({
                 prenotazione: result
             });
@@ -66,20 +63,17 @@ router.get('/:prenotazioneProp', /*checkAuth*/ (req, res, next) => {
         .exec()
         .then(result => {
             if (result.length == 0){
-                console.log(err);
                 res.status(404).json({
                     error: 'Prenotazione non trovata'
                 });
             }
             else {
-                console.log(result);
                 res.status(200).json({
                     prenotazione: result
                 });
             }
         })
         .catch(err =>{
-            console.log(err);
             res.status(500).json({
                 error: 'Errore nel trovare informazioni sul film'
             });
@@ -88,53 +82,51 @@ router.get('/:prenotazioneProp', /*checkAuth*/ (req, res, next) => {
 });
 
 // gestore richieste POST
-router.post('/', /*checkAuth*/ (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
     Infofilm.findById(req.body.infofilmId)
     .then(infofilm => {
         if (!infofilm){
-            console.log("Impossibile creare prenotazioni su informazioni inesistenti")
             res.status(404).json({
                 error: 'Impossibile creare prenotazioni su informazioni inesistenti'
             });
         }
-    })
-    Utente.findById(req.body.utenteId)
-    .then(utente => {
-        if (!utente){
-            console.log("Impossibile creare prenotazioni di un utente inesistente")
-            res.status(404).json({
-                error: 'Impossibile creare prenotazioni di un utente inesistente'
+        else {
+            Utente.findById(req.body.utenteId)
+            .then(utente => {
+                if (!utente) {
+                    res.status(404).json({
+                        error: 'Impossibile creare prenotazioni di un utente inesistente'
+                    });
+                }
+                const prenotazione = new Prenotazione({
+                    _id: new mongoose.Types.ObjectId(),
+                    utente: req.body.utenteId,
+                    infofilm: req.body.infofilmId
+                });
+                return prenotazione
+                .save()
+            })
+            .then(result => {
+                res.status(201).json({
+                    prenotazioneRegistrata: {
+                        _id: result._id,
+                        utente: result.utente,
+                        infofilm: result.infofilm,
+                    },
+                    message: 'Prenotazione effettuata',
+                    request: {
+                        type: 'GET',
+                        url: '../prenotazioni/' + result._id
+                    }
+                });
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error: 'Operazione fallita'
+                });
             });
         }
-        const prenotazione = new Prenotazione({
-            _id : mongoose.Types.ObjectId(),
-            utente: req.body.utenteId,
-            infofilm: req.body.infofilmId
-        });
-        return prenotazione
-        .save()
-    })
-    .then(result => {
-        console.log(result);
-        res.status(201).json({
-            prenotazioneEffettuata: {
-                _id: result._id,
-                utente: result.utente,
-                infofilm: result.infofilm
-            },
-            message: 'Prenotazione effettuata',
-            request: {
-                type: 'GET',
-                url: '../prenotazioni/' + result._id
-            }
-        });
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({
-            error: 'Errore nella creazione della prenotazione'
-        })
-    });
+    });  
 });
 
 // gestore richieste DELETE
@@ -145,7 +137,6 @@ router.delete('/:prenotazioneId', /*checkAuth*/ (req, res, next) => {
     .exec()
     .then(result => {
         if (result == null){
-            console.log('Prenotazione non trovata');
             res.status(404).json({
                 error: 'Prenotazione non trovata'
             });
@@ -155,7 +146,6 @@ router.delete('/:prenotazioneId', /*checkAuth*/ (req, res, next) => {
             .deleteOne({_id : id})
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Prenotazione cancellata'
                 });
@@ -163,7 +153,6 @@ router.delete('/:prenotazioneId', /*checkAuth*/ (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error: 'Errore nella cancellazione della prenotazione'
         });

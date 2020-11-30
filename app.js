@@ -1,6 +1,6 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -10,10 +10,6 @@ const saleRoute = require('./URI/sale.js');
 const infofilmsRoute = require('./URI/infofilms.js');
 const utentiRoute = require('./URI/utenti.js');
 const recensioniRoute = require('./URI/recensioni.js');
-
-// connessione al database
-mongoose.connect("mongodb+srv://ADMIN:MJM9qhqIcXUbdCHd@test.dgbif.mongodb.net/Cinema?retryWrites=true&w=majority", 
-{ useUnifiedTopology: true , useNewUrlParser: true});
 
 // configurazione del body-parser
 app.use(bodyParser.urlencoded({extended : false}));

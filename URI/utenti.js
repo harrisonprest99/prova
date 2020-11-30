@@ -7,26 +7,36 @@ const checkAuth = require('../MIDDLEWARE/check-auth');
 
 const Utente = require('../MODELS/utente.js');
 
-// handle POST requests (SIGN UP)
+// gestore richieste POST (SIGN UP)
 router.post('/signup', (req, res, next) => {
-    // check if the mail already exists in the database
     Utente
     .find({ email: req.body.email })
     .exec()
     .then(user => {
+        if (req.body.password == null) {
+            return res.status(400).json({
+                error: 'Password obbligatoria'
+            });
+        }
+        if (!(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(req.body.email))) {
+            return res.status(400).json({
+                error: 'L\'email inserita non è valida'
+            });
+        }
         if (user.length >= 1) {
             return res.status(409).json({
-                message: 'Email appartiene già ad un altro account'
+                error: 'L\'Email appartiene già ad un altro account'
             });
-        } else {
-            // password encryption
+        } 
+        else {
+            if (req.body.email)
             bcrypt.hash(req.body.password, 10, (err, hash) => {
                 if (err) {
                     return res.status(500).json({
-                        error: err,
-                        message: 'Password encryption failed'
+                        error: 'Criptazione della password fallita'
                     });
-                } else { // if encryption is succesful, save the hash as the password
+                } 
+                else { 
                     const user = new Utente({
                         _id: new mongoose.Types.ObjectId(),
                         username: req.body.username,
@@ -36,15 +46,13 @@ router.post('/signup', (req, res, next) => {
                     user
                     .save()
                     .then(result => {
-                        console.log(result);
                         res.status(201).json({
                             message: 'Utente creato'
                         });
                     })
                     .catch(err => {
-                        console.log(err);
                         res.status(500).json({
-                            error : 'Errore nella creazione dell\'utente'
+                            error: 'Errore nella creazione dell\'utente'
                         });
                     });
                 }
@@ -53,7 +61,7 @@ router.post('/signup', (req, res, next) => {
     })
 }); 
 
-// handle POST requests (SIGN IN)
+// gestore richieste POST (LOGIN)
 router.post('/login', (req, res, next) => {
     Utente
     .find({ email: req.body.email })
@@ -61,13 +69,13 @@ router.post('/login', (req, res, next) => {
     .then(utente => {
         if (utente.length < 1) {
             return res.status(401).json({
-                message: 'Auth failed, email or password is wrong'
+                error: 'Autorizzazione fallita, email o password errati'
             });
         }
         bcrypt.compare(req.body.password, utente[0].password, (err, result) => {
             if (err) {
                 return res.status(401).json({
-                    message: 'Auth failed, email or password is wrong'
+                    error: 'Autorizzazione fallita, email o password errati'
                 });
             }
             if (result) {
@@ -83,22 +91,21 @@ router.post('/login', (req, res, next) => {
                     }
                 );
                 return res.status(200).json({
-                    message: 'Auth successful',
+                    message: 'Autorizzazione avvenuta con successo',
+                    token: token,
                     email: utente[0].email,
-                    username: utente[0].username,
                     _id: utente[0]._id,
-                    token: token
+                    username: utente[0].username
                 });
             }
             return res.status(401).json({
-                message: 'Auth failed, email or password is wrong'
+                error: 'Autorizzazione fallita, email o password errati'
             });
         });
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
-            error : 'Errore nel login'
+            error: 'Errore nel login'
         });
     });
 });
@@ -111,9 +118,8 @@ router.delete('/:utenteId', (req, res, next) => {
     .exec()
     .then(result => {
         if (result == null){
-            console.log("Utente non trovato");
             res.status(404).json({
-                error : 'Utente non trovato'
+                error: 'Utente non trovato'
             });
         }
         else {
@@ -121,7 +127,6 @@ router.delete('/:utenteId', (req, res, next) => {
             .deleteOne({_id : id})
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Utente cancellato'
                 });
@@ -129,9 +134,8 @@ router.delete('/:utenteId', (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
-            error : 'Errore nella cancellazione utente'
+            error: 'Errore nella cancellazione utente'
         });
     });
 });
@@ -142,7 +146,6 @@ router.get('/', (req, res, next) => {
     .select('_id username email password')
     .exec()
     .then(result => {
-        console.log(result);
         res.status(200).json({
             count: result.length,
             utenti: result.map(doc => {
@@ -161,9 +164,8 @@ router.get('/', (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
-            error: 'Errore nella richiesta degli utenti'
+            error: 'Operazione fallita'
         });
     });
 });
@@ -177,11 +179,10 @@ router.get('/:utenteProp', (req, res, next) => {
     .exec()
     .then(result => {
         if (result.length != 0) {
-            console.log(result)
             res.status(200).json({
                 message: 'Utente trovato',
                 utente: result,
-                self: '/utenti/' + doc._id,
+                self: '/utenti/' + result._id,
                 url: '../recensioni/' + result._id
             });
         }
@@ -193,20 +194,25 @@ router.get('/:utenteProp', (req, res, next) => {
         .exec()
         .then(result => {
             if (result.length == 0){
-                console.log(err);
                 res.status(404).json({
                     error: 'Utente non trovato'
                 });
             }
             else {
-                console.log(result);
                 res.status(200).json({
                     message: 'Utente trovato',
                     utente: result,
-                    url: '../utenti/' + result._id
+                    self: '/utenti/' + result._id,
+                    url: '../recensioni/' + result._id
                 });
             }
         })
+        .catch(err => {
+            res.status(500).json({
+                error: 'Operazione fallita'
+            })
+        })
     });
 });
+
 module.exports = router;

@@ -10,10 +10,9 @@ const Film = require('../MODELS/film.js');
 router.get('/', (req, res, next) => {
     Film
     .find()
-    .select('_id titolo descrizione anno durata linkImmagine linkTrailer')
+    .select('_id titolo descrizione anno durata linkImmagine linkTrailer linkBanner')
     .exec()
     .then(result => {
-        console.log(result);
         res.status(200).json({
             count: result.length,
             films: result.map(doc => {
@@ -25,6 +24,7 @@ router.get('/', (req, res, next) => {
                     durata: doc.durata,
                     linkImmagine: doc.linkImmagine,
                     linkTrailer: doc.linkTrailer,
+                    linkBanner: doc.linkBanner,
                     self: '/films/' + doc._id,
                     request: {
                         type: 'GET',
@@ -35,7 +35,6 @@ router.get('/', (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error: 'Errore nella richiesta dei film'
         });
@@ -47,11 +46,10 @@ router.get('/:filmProp', (req, res, next) => {
     const prop = req.params.filmProp;
     Film
     .findById(prop)
-    .select('_id titolo descrizione anno durata linkImmagine linkTrailer')
+    .select('_id titolo descrizione anno durata linkImmagine linkTrailer linkBanner')
     .exec()
     .then(result => {
         if (result.length != 0) {
-            console.log(result)
             res.status(200).json({
                 message: 'Film trovato',
                 film: result,
@@ -63,24 +61,23 @@ router.get('/:filmProp', (req, res, next) => {
     .catch(err => {
         Film
         .find({titolo : prop})
-        .select('_id titolo descrizione anno durata linkImmagine linkTrailer')
+        .select('_id titolo descrizione anno durata linkImmagine linkTrailer linkBanner')
         .exec()
         .then(result => {
             if (result.length == 0){
-                console.log(err);
                 res.status(404).json({
                     error: 'Film non trovato'
                 });
             }
             else {
-                console.log(result);
                 res.status(200).json({
                     message: 'Film trovato',
                     film: result,
+                    self: '/films/' + result._id,
                     url: '../recensioni/' + result._id
                 });
             }
-        })
+        });
     });
 });
 
@@ -93,12 +90,12 @@ router.post('/',/* checkAuth, */(req, res, next) => {
         anno: req.body.anno,
         durata: req.body.durata,
         linkImmagine: req.body.linkImmagine,
-        linkTrailer: req.body.linkTrailer
+        linkTrailer: req.body.linkTrailer,
+        linkBanner: req.body.linkBanner
     });
     film
     .save()
     .then(result => {
-        console.log(result);
         res.status(201).json({
             filmRegistrato: {
                 _id: result._id,
@@ -115,7 +112,6 @@ router.post('/',/* checkAuth, */(req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err)
         res.status(500).json({
             error: 'Operazione fallita'
         });
@@ -130,7 +126,6 @@ router.delete('/:filmId', /*checkAuth, */(req, res, next) => {
     .exec()
     .then(result => {
         if (result == null){
-            console.log("Film non trovato");
             res.status(404).json({
                 error: 'Film non trovato'
             });
@@ -140,7 +135,6 @@ router.delete('/:filmId', /*checkAuth, */(req, res, next) => {
             .deleteOne({_id : id})
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Film cancellato'
                 });
@@ -148,9 +142,8 @@ router.delete('/:filmId', /*checkAuth, */(req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
-            error : 'Errore nella cancellazione del film'
+            error: 'Errore nella cancellazione del film'
         });
     });
 });
@@ -163,13 +156,11 @@ router.patch('/:filmId', /*checkAuth,*/ (req, res, next) => {
     .exec()
     .then(result => {
         if (result == null){
-            console.log("Film non trovato");
             res.status(404).json({
                 error: 'Film non trovato'
             });
         }
         else {
-            console.log(result);
             const updateOps = {};
             for(const ops of req.body) {
                 updateOps[ops.propName] = ops.value;
@@ -178,7 +169,6 @@ router.patch('/:filmId', /*checkAuth,*/ (req, res, next) => {
             .updateOne({_id : id}, {$set: updateOps})
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Film modificato correttamente'
                 })
@@ -187,7 +177,6 @@ router.patch('/:filmId', /*checkAuth,*/ (req, res, next) => {
         
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error: 'Errore nella modifica del film'
         });

@@ -12,7 +12,6 @@ router.get('/', (req, res, next) => {
     .select('_id nome posti_tot')
     .exec()
     .then(result => {
-        console.log(result);
         res.status(200).json({
             count: result.length,
             sale: result.map(doc => {
@@ -29,7 +28,6 @@ router.get('/', (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error: 'Errore nella richiesta delle sale'
         });
@@ -45,7 +43,6 @@ router.get('/:salaProp', (req, res, next) => {
     .exec()
     .then(result => {
         if (result.length != 0) {
-            console.log(result);
             res.status(200).json({
                 sala: result
             });
@@ -58,20 +55,17 @@ router.get('/:salaProp', (req, res, next) => {
         .exec()
         .then(result => {
             if (result.length == 0){
-                console.log(err);
                 res.status(404).json({
                     error: 'Sala non trovata'
                 });
             }
             else {
-                console.log(result);
                 res.status(200).json({
                     sala: result
                 });
             }
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({
                 error: 'Errore nel trovare la sala'
             });
@@ -89,7 +83,6 @@ router.post('/', /*checkAuth,*/ (req, res, next) => {
     sala
     .save()
     .then(result => {
-        console.log(result);
         res.status(201).json({
             salaRegistrata: {
                 _id: result._id,
@@ -104,7 +97,6 @@ router.post('/', /*checkAuth,*/ (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err)
         res.status(500).json({
             error: 'Operazione fallita'
         });
@@ -119,7 +111,6 @@ router.delete('/:salaId', /*checkAuth,*/ (req, res, next) => {
     .exec()
     .then(result => {
         if (result == null){
-            console.log("Sala non trovata");
             res.status(404).json({
                 error: 'Sala non trovata'
             });
@@ -129,7 +120,6 @@ router.delete('/:salaId', /*checkAuth,*/ (req, res, next) => {
             .deleteOne({_id : id})
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Sala cancellata'
                 });
@@ -137,7 +127,6 @@ router.delete('/:salaId', /*checkAuth,*/ (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error: 'Errore nella cancellazione della sala'
         });
@@ -152,13 +141,11 @@ router.patch('/:salaId', /*checkAuth,*/ (req, res, next) => {
     .exec()
     .then(result => {
         if (result == null){
-            console.log("Sala non trovata");
             res.status(404).json({
                 error: 'Sala non trovata'
             });
         }
         else {
-            console.log(result);
             const updateOps = {};
             for(const ops of req.body) {
                 updateOps[ops.propName] = ops.value;
@@ -167,7 +154,6 @@ router.patch('/:salaId', /*checkAuth,*/ (req, res, next) => {
             .updateOne({_id : id}, {$set: updateOps})
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Sala modificata correttamente'
                 })
@@ -176,7 +162,6 @@ router.patch('/:salaId', /*checkAuth,*/ (req, res, next) => {
         
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error: 'Errore nella modifica della sala'
         });

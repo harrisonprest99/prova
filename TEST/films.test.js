@@ -1,42 +1,60 @@
-const app = require("../app");
-const request = require("supertest");
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+const request = require('supertest');
+const Film = require('../MODELS/film');
+const app = require('../app');
 
-describe("POST / ", () => {
-    test('POST with no body', () => {
-        return request(app)
-            .post('/films')
-            //.set('x-access-token', token)
-            .set('Accept', 'application/json')
-            .expect(500, { error: 'Operazione fallita' });
-    });
-});
-
-describe("GET / ", () => {
+describe("/films", () => {
 
     let connection;
 
-    beforeAll( async () => {
-      jest.setTimeout(8000);
-      jest.unmock('mongoose');
-      connection = await  mongoose.connect("mongodb+srv://ADMIN:MJM9qhqIcXUbdCHd@test.dgbif.mongodb.net/Cinema?retryWrites=true&w=majority",
-        {useNewUrlParser: true, useUnifiedTopology: true});
-      console.log('Database connected!');
-    });
-  
-    afterAll( () => {
-      mongoose.connection.close(true);
-      console.log("Database connection closed");
+    beforeAll(async(done) => {
+        connection = await mongoose.connect(process.env.DB_URL, 
+        { useUnifiedTopology: true , useNewUrlParser: true})
+        done();
     });
 
-    test('GET should return an array of films', async () => {
-        return request(app)
-            .get('/films')
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .then( (res) => {
-                expect(res.body).not.toBeNull();
-            }
-        );
+    afterAll(async(done) => {
+        await mongoose.connection.close();
+        done();
     });
+
+    test('GET /film/:titolo', async(done) => {
+        const res = await request(app).get('/films/prova');
+        expect(res.statusCode && res.text).toBe(404 && '{"error":"Film non trovato"}');
+        done();
+    })
+
+    test('POST /films senza body', async(done) => {
+        const res = await request(app).post('/films').send({});
+        expect(res.statusCode && res.text).toBe(500 && '{"error":"Operazione fallita"}');
+        done();  
+    });
+
+    test('POST /films senza titolo', async(done) => {
+        const res = await request(app).post('/films').send({
+            anno: 2006, 
+            durata: 100
+        });
+        expect(res.statusCode && res.text).toBe(500 && '{"error":"Operazione fallita"}');
+        done();  
+    });
+
+    test('POST /films senza anno', async(done) => {
+        const res = await request(app).post('/films').send({
+            titolo: 'prova',
+            durata: 100
+        });
+        expect(res.statusCode && res.text).toBe(500 && '{"error":"Operazione fallita"}');
+        done();  
+    });
+    
+    test('POST /films senza durata', async(done) => {
+        const res = await request(app).post('/films').send({
+            titolo: 'prova', 
+            anno: 2006
+        });
+        expect(res.statusCode && res.text).toBe(500 && '{"error":"Operazione fallita"}');
+        done();  
+    });
+
 });

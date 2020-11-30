@@ -10,38 +10,35 @@ const checkAuth = require('../MIDDLEWARE/check-auth');
 // gestore richieste GET
 router.get('/', (req, res, next) => {
     Recensione
-    .find()
-    .select('_id utente film titolo valutazione commento')
-    .populate('utente', 'username email')
-    .populate('film', 'titolo descrizione anno durata')
-    .exec()
-    .then(result => {
-        console.log(result);
-        res.status(200).json({
-            count: result.length,
-            recensioni: result.map(doc => {
-                return {
-                    _id: doc._id,
-                    utente: doc.utente,
-                    film: doc.film,
-                    titolo: doc.titolo,
-                    valutazione: doc.valutazione,
-                    commento: doc.commento,
-                    request: {
-                        type: 'GET',
-                        url: '../recensioni/' + doc._id
+        .find()
+        .select('_id utente film titolo valutazione commento')
+        .populate('utente', 'username email')
+        .populate('film', 'titolo descrizione anno durata')
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                count: result.length,
+                recensioni: result.map(doc => {
+                    return {
+                        _id: doc._id,
+                        utente: doc.utente,
+                        film: doc.film,
+                        titolo: doc.titolo,
+                        valutazione: doc.valutazione,
+                        commento: doc.commento,
+                        request: {
+                            type: 'GET',
+                            url: '../recensioni/' + doc._id
+                        }
                     }
-                }
-            })
-            
+                })
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: 'Errore nella richiesta delle recensioni'
+            });
         });
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({
-            error : 'Errore nella richiesta delle recensioni'
-        });
-    });
 });
 
 // gestore richieste GET
@@ -55,137 +52,130 @@ router.get('/:recensioneProp', (req, res, next) => {
     .exec()
     .then(result => {
         if (result.length != 0) {
-            console.log(result);
             res.status(200).json({
-                message : 'Recensione trovata',
-                recensione : result
+                recensione: result
             });
         }
     })
     .catch(err => {
         Recensione
-        .find({film : prop})
+        .find({ film: prop })
         .select('_id utente film titolo valutazione commento')
         .populate('utente', 'username email')
         .populate('film', 'titolo descrizione anno durata')
         .exec()
         .then(result => {
-            if (result.length != 0){
-                console.log(result);
+            if (result.length != 0) {
                 res.status(200).json({
-                    message : "Recensione trovata",
-                    recensione : result
+                    recensione: result
                 });
             }
             else {
                 Recensione
-                .find({utente : prop})
+                .find({ utente: prop })
                 .select('_id utente film titolo valutazione commento')
                 .populate('utente', 'username email')
                 .populate('film', 'titolo descrizione anno durata')
                 .exec()
                 .then(result => {
-                    if (result.length != 0){
-                        console.log(result);
+                    if (result.length != 0) {
                         res.status(200).json({
-                            message : "Recensione trovata",
-                            recensione : result
+                            recensione: result
                         });
                     }
                     else {
-                        console.log(result);
                         res.status(404).json({
-                            message : "Recensione non trovata"
+                            error: 'Recensione non trovata'
                         });
                     }
                 })
             }
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({
-                message : 'Errore nel trovare la recensione'
+                error: 'Errore nel trovare la recensione'
             });
         });
     });
 });
 
 // gestore richieste POST
-router.post('/', /*checkAuth,*/ (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
     Film.findById(req.body.filmId)
     .then(film => {
-        if (!film){
-            console.log("Impossibile creare recensioni su film inesistente")
+        if (!film) {
             res.status(404).json({
                 error: 'Impossibile creare recensioni su film inesistente'
             });
         }
-    })
-    Utente.findById(req.body.utenteId)
-    .then(utente => {
-        if (!utente){
-            console.log("Impossibile creare recensioni di un utente inesistente")
-            res.status(404).json({
-                error: 'Impossibile creare recensioni di un utente inesistente'
+        else {
+            Utente.findById(req.body.utenteId)
+            .then(utente => {
+                if (!utente) {
+                    res.status(404).json({
+                        error: 'Impossibile creare recensioni di un utente inesistente'
+                    });
+                } 
+                else {
+                    if ((req.body.valutazione<1) || (req.body.valutazione>5)){
+                        res.status(400).json({
+                            error: 'La valutazione deve essere compresa tra 1 e 5'
+                        });
+                    }
+                }
+                const recensione = new Recensione({
+                    _id: new mongoose.Types.ObjectId(),
+                    utente: req.body.utenteId,
+                    film: req.body.filmId,
+                    titolo: req.body.titolo,
+                    valutazione: req.body.valutazione,
+                    commento: req.body.commento
+                });
+                return recensione.save();
+            })
+            .then(result => {
+                res.status(201).json({
+                    recensioneRegistrata: {
+                        _id: result._id,
+                        utente: result.utente,
+                        film: result.film,
+                        titolo: result.titolo,
+                        valutazione: result.valutazione,
+                        commento: result.commento
+                    },
+                    message: 'Recensione registrata',
+                    request: {
+                        type: 'GET',
+                        url: '../recensioni/' + result._id
+                    }
+                });
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error: 'Operazione fallita'
+                });
             });
         }
-        const recensione = new Recensione({
-            _id: new mongoose.Types.ObjectId(),
-            utente: req.body.utenteId,
-            film: req.body.filmId,
-            titolo: req.body.titolo,
-            valutazione: req.body.valutazione,
-            commento:req.body.commento
-        });
-        return recensione
-        .save()
     })
-    
-    .then(result => {
-        console.log(result);
-        res.status(201).json({
-            recensioneRegistrata: {
-                _id: result._id,
-                utente: result.utente,
-                film: result.film,
-                titolo: result.titolo,
-                valutazione: result.valutazione,
-                commento: result.commento
-            },
-            message: 'Recensione registrata',
-            request: {
-                type: 'GET',
-                url: '../recensioni/' + result._id
-            }
-        });
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(400).json({
-            error : "Operazione fallita"
-        });
-    }); 
 });
 
 // gestore richieste DELETE
-router.delete('/:recensioneId', /*checkAuth,*/ (req, res, next) => {
+router.delete('/:recensioneId', /*checkAuth,*/(req, res, next) => {
     const id = req.params.recensioneId;
     Recensione
     .findById(id)
     .exec()
     .then(result => {
-        if (result == null){
-            console.log("Recensione non trovata");
+        if (result == null) {
             res.status(404).json({
-                error : 'Recensione non trovata'
+                error: 'Recensione non trovata'
             });
         }
         else {
             Recensione
-            .deleteOne({_id : id})
+            .deleteOne({ _id: id })
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Recensione cancellata'
                 });
@@ -193,9 +183,8 @@ router.delete('/:recensioneId', /*checkAuth,*/ (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
-            error : 'Errore nella cancellazione della recensione'
+            error: 'Errore nella cancellazione della recensione'
         });
     });
 });
@@ -207,38 +196,32 @@ router.patch('/:recensioneId', checkAuth, (req, res, next) => {
     .findById(id)
     .exec()
     .then(result => {
-        if (result == null){
-            console.log("Recensione non trovata");
+        if (result == null) {
             res.status(404).json({
-                error : 'Recensione non trovata'
+                error: 'Recensione non trovata'
             });
         }
         else {
-            console.log(result);
             const updateOps = {};
-            for(const ops of req.body) {
+            for (const ops of req.body) {
                 updateOps[ops.propName] = ops.value;
             }
             Recensione
-            .updateOne({_id : id}, {$set: updateOps})
+            .updateOne({ _id: id }, { $set: updateOps })
             .exec()
             .then(result => {
-                console.log(result);
                 res.status(200).json({
                     message: 'Recensione modificata correttamente'
                 })
-            })    
+            })
         }
-        
+
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
-            error : 'Errore nella modifica della recensione'
+            error: 'Errore nella modifica della recensione'
         });
     });
-    
-    
 });
 
 module.exports = router;
